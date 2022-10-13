@@ -49,38 +49,46 @@ class GameAccount{
 
     public string UserName{get; set;}
     public int CurrentRating{get; set;}
+ //save user's rating as a string
     public string GameResultRating = "";
     public int GamesCount;
+ //save opponent's name
     public string OpponentName = "";
     private List<Game> gameAccountStatus = new List<Game>();
+ //save result like "win" or "lose"
     public string GameResult = "";
 
 
     public GameAccount(string name){
         UserName = name;
         GamesCount = 0;
+     //generate user's rating
         CurrentRating = new Random().Next(1,100);
     }
 
+ //method for play game
     public void playGame(GameAccount opponent){
 
+     //create the Game's object
         Game game  = new Game(this, opponent);
-
+//create dices 
         int dice1 = new Random().Next(1,6);
         int dice2 = new Random().Next(1,6);
 
+     
         if(dice1 > dice2){
             WinGame(opponent, game.GameRating);
         }
         else if(dice1 < dice2){
             LooseGame(opponent, game.GameRating);
         }
+     //if dices have equal value we need to change it
         else{
             dice1 = new Random().Next(1,6);
         }
     }
 
-
+//method for victory
     public void WinGame(GameAccount opponent, int GameRating){
         this.OpponentName = opponent.UserName;//user's opponent -> opponent
         opponent.OpponentName = this.UserName;// opponent's opponent -> user
@@ -91,15 +99,16 @@ class GameAccount{
         this.GameResultRating = "+" + GameRating.ToString();//user +
         opponent.GameResultRating = "-" + GameRating.ToString();//opponent -
 
-
+//check opponent's rating
         opponent.CurrentRating = (checkRating(opponent, GameRating)) ? 1: opponent.CurrentRating - GameRating;
-
+//add points to winner
         this.CurrentRating += GameRating;
-
+//create Game's objects
         Game winGame = new Game(this, opponent);
         Game opWinGame = new Game(opponent, this);
+     //they need to have the same game's ID as it's the one game for both players
         opWinGame.GameIdStr = winGame.GameIdStr;
-
+//add result of this method to both gamers' list
         gameAccountStatus.Add(winGame); 
         opponent.gameAccountStatus.Add(opWinGame);
 
@@ -130,12 +139,15 @@ class GameAccount{
         opponent.gameAccountStatus.Add(opLoose);
     }
 
+ //method for checking user's rating
     public Boolean checkRating(GameAccount user, int GameRating){
 
         Boolean isChecked = false;
+     //if rating is less than 0 this method throw error. Else -> substracte rating
         return isChecked = (user.CurrentRating < 0) ? throw new ArgumentOutOfRangeException(nameof(user.CurrentRating), $"{user.UserName}'s rating is less than 0"): isChecked = true;
     }
 
+ //method for getting status
     public string getStatus(){
         var result = new System.Text.StringBuilder();
         result.AppendLine($"for current user - {this.UserName}\n");
@@ -173,6 +185,7 @@ class Game{
         mainUser = user;
         this.OpponentUser = opponentUser;
 
+     //assign appropriate properties
         mainUserRating = mainUser.CurrentRating;
         opponentUserRating = OpponentUser.CurrentRating;
 
@@ -181,7 +194,7 @@ class Game{
         GameRatingStr = GameRating.ToString();
 
         GameRating = new Random().Next(1, 15);
-        OpponentGameResult = opponentUser.GameResult;//save not opponent result
+        OpponentGameResult = opponentUser.GameResult;
 
         GameResultRating = mainUser.GameResultRating;
         OpponentGameResultRating = this.OpponentUser.GameResultRating;
